@@ -164,6 +164,8 @@ public class GameView extends SurfaceView implements Runnable {
                 }
 
             }
+
+            //some changes
         }
 
         engine.openEndScreen(10);
