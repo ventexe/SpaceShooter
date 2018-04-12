@@ -6,20 +6,6 @@
     android:layout_height="match_parent"
     tools:context="uk.ac.reading.vn013442.spaceshooter.GameEngine">
 
-    <!--
-   <ImageView
-       android:id="@+id/bgimage"
-       android:layout_width="wrap_content"
-       android:layout_height="wrap_content"
-       android:layout_alignParentBottom="true"
-       android:layout_alignParentEnd="true"
-       android:layout_alignParentStart="true"
-       android:layout_alignParentTop="true"
-       android:adjustViewBounds="true"
-       android:scaleType="fitXY"
-       app:srcCompat="@drawable/bgmain" />
-       -->
-
 
     <Button
         android:id="@+id/playAgain"
@@ -27,33 +13,60 @@
         android:layout_height="wrap_content"
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
-        android:text="Play Again"
-        android:onClick="playAgain"/>
+        android:onClick="playAgain"
+        android:text="Play Again" />
+
+    <Button
+        android:id="@+id/btnQuit"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/playAgain"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="11dp"
+        android:onClick="btnQuit"
+        android:text="Quit" />
+
 
     <TextView
         android:id="@+id/gameOver"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/scoreLabel"
+        android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="25dp"
-        android:text="GAME OVER!" />
+        android:layout_marginTop="50dp"
+        android:text="GAME OVER!"
+        android:textColor="#ffff00" />
 
     <TextView
         android:id="@+id/scoreLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/highScoreLabel"
+        android:layout_below="@+id/gameOver"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="26dp"
-        android:text="Score: 150" />
+        android:text="Score: 150"
+        android:textColor="#ffff00" />
 
     <TextView
         android:id="@+id/highScoreLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/playAgain"
+        android:layout_below="@+id/scoreLabel"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="22dp"
-        android:text="High Score: 300" />
+        android:layout_marginTop="12dp"
+        android:text="High Score: 300"
+        android:textColor="#ffff00" />
+
+    <ImageView
+        android:id="@+id/bgimageblank"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        app:srcCompat="@drawable/bgimageblank" />
+
+
 </RelativeLayout>

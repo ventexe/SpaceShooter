@@ -38,8 +38,6 @@ public class GameView extends SurfaceView implements Runnable {
     Context TYPE_ACCELEROMETER;
     Context TYPE_MAGNETIC_FIELD;
 
-    public static int stepSize = 5;
-
     private int screenWidth;
     private int screenHeight;
 
@@ -52,7 +50,6 @@ public class GameView extends SurfaceView implements Runnable {
 
     List<Drawable> entities = new ArrayList<>();
     OrientationData orientationData;
-
 
 
     //private Point playerPoint;
@@ -81,25 +78,18 @@ public class GameView extends SurfaceView implements Runnable {
 
         this.holder = getHolder();
 
-        //x_dir = 10;
-        //y_dir = 10;
-
-        //bmEnemy = bmEnemy + x_dir;
-        //bmEnemy = bmEnemy + y_dir;
 
         //add objects to screen
         entities.add(new Player(bmPlayer, 20, 200));
         entities.add(new Enemy(bmEnemy, 1000, 0));
         entities.add(new Enemy(bmEnemy, 1000, 200));
         entities.add(new Enemy(bmEnemy, 1000, 400));
+        entities.add(new Bullet(bmBullet, 200, 275));
         //entities.add(new Player(bmAsteroid, 500, 200));
 
-        //invalidate();
 
         orientationData = new OrientationData();
         orientationData.register();
-
-
 
 
     }
@@ -130,6 +120,23 @@ public class GameView extends SurfaceView implements Runnable {
         canvas.drawColor(Color.BLACK);
         canvas.drawText("1", 50, 50, paint);
     }
+
+
+    public boolean Collision(Bitmap image, int x, int y) {
+        return getCollision(image, x, y);
+    }
+
+    public getCollision Collision(Bitmap image, int x, int y) {
+        for (Bullet image : Enemy) {
+            if(Bullet instanceof Enemy) {
+                bmEnemy.recycle();  //remove enemy
+            }
+        }
+
+        return null;
+    }
+
+
 
     @Override
     public void run() {
@@ -165,7 +172,6 @@ public class GameView extends SurfaceView implements Runnable {
 
             }
 
-            //some changes
         }
 
         engine.openEndScreen(10);
@@ -173,36 +179,20 @@ public class GameView extends SurfaceView implements Runnable {
     }
 
 
-
-/**
-
-            if(Drawable.x < 0)
-                Drawable.x = 0;
-            else if(Drawable.x > Constants.SCREEN_WIDTH)
-                Drawable.x = Constants.SCREEN_WIDTH;
-
-            if(Drawable.y < 0)
-                Drawable.y = 0;
-            else if(Drawable.y > Constants.SCREEN_HEIGHT)
-                Drawable.y = Constants.SCREEN_HEIGHT;
-        }
-    }
- *
- */
-
-
-
-
     //update the data from the game
     private void update() {
         for (int i = 0; i < entities.size(); i++) {
-            for (Drawable drawable: entities) {
+            for (Drawable drawable : entities) {
                 if (drawable instanceof Enemy) {
-                    ((Enemy)drawable).move();
+                    ((Enemy) drawable).move();
 
+                }
+                if (drawable instanceof Bullet) {
+                    ((Bullet) drawable).move();
                 }
             }
         }
+
     }
 
     //draw here
@@ -212,27 +202,15 @@ public class GameView extends SurfaceView implements Runnable {
 
             canvas.drawColor(Color.argb(255, 0, 0, 0));
 
-            for (Drawable entity: entities) {
+            for (Drawable entity : entities) {
                 canvas.drawBitmap(entity.getImage(), entity.getX(), entity.getY(), paint);
             }
-
-            //Player player = new Player;
-
-            //canvas.drawBitmap(bmEnemy, 550, 200, paint);
-            //canvas.drawBitmap(bmBullet, 100, 400, paint);
-            //canvas.drawBitmap(bmAsteroid, 350, 300, paint);
-            //canvas.drawBitmap(bmBackground, 550, 200, paint);
-
-
 
             holder.unlockCanvasAndPost(canvas);
         }
     }
 
 
-
-
-
-    }
+}
 
 

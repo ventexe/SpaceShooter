@@ -12,7 +12,7 @@ public abstract class Drawable {
     //protected final int colCount;
 
     //protected final int WIDTH;
-   // protected final int HEIGHT;
+    // protected final int HEIGHT;
 
     //protected final int width;
     //protected final int height;
@@ -21,7 +21,7 @@ public abstract class Drawable {
     protected int y;
 
     //public Drawable(Bitmap image, int rowCount, int colCount, int x, int y)  {
-      public Drawable(Bitmap image, int x, int y) {
+    public Drawable(Bitmap image, int x, int y) {
 
         this.image = image;
         //this.rowCount= rowCount;
@@ -39,26 +39,28 @@ public abstract class Drawable {
 
 
     /**
-    protected Bitmap createSubImageAt(Bitmap image, int x, int y)  {
+     * protected Bitmap createSubImageAt(Bitmap image, int x, int y)  {
+     * <p>
+     * //Bitmap subImage = Bitmap.createBitmap(image, col* width, row* height ,width, height);
+     * //Bitmap subImage = Bitmap.createBitmap(image, col* width, row* height ,width, height);
+     * Bitmap subImage = Bitmap.createBitmap(x, y, image);
+     * <p>
+     * return subImage;
+     * }
+     */
 
-        //Bitmap subImage = Bitmap.createBitmap(image, col* width, row* height ,width, height);
-        //Bitmap subImage = Bitmap.createBitmap(image, col* width, row* height ,width, height);
-        Bitmap subImage = Bitmap.createBitmap(x, y, image);
-
-        return subImage;
-    }
-    */
-
-    public int getX()  {
+    public int getX() {
         return this.x;
     }
 
-    public int getY()  {
+    public int getY() {
         return this.y;
     }
 
 
-    public Bitmap getImage() { return this.image; }
+    public Bitmap getImage() {
+        return this.image;
+    }
 
     /**
      public int getHeight() {

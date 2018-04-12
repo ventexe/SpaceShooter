@@ -25,9 +25,13 @@ public class MainMenu extends AppCompatActivity {
             }
         });
     }
-        public void openPlay() {
-            Intent intent = new Intent(this, GameEngine.class);
-            startActivity(intent);
+
+    public void openPlay() {
+        Intent intent = new Intent(this, GameEngine.class);
+        startActivity(intent);
     }
+
+
 }
+
 

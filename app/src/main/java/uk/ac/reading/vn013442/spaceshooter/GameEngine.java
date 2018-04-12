@@ -53,32 +53,37 @@ public class GameEngine extends AppCompatActivity {
 
 }
 
-        /**
-        ImageView.setOnTouchListener(new onTouchListener()) {
+/**
+ * ImageView.setOnTouchListener(new onTouchListener()) {
+ *
+ * @Override public boolean onTouch(View v, MotionEvent event){
+ * if (event.getAction() == MotionEvent.ACTION_DOWN) {
+ * <p>
+ * return true;
+ * }
+ * return false;
+ * }
+ * @Override public void surfaceCreated(SurfaceHolder holder) {
+ * background = new Background(BitmapFactory.decodeResource(getResources(), R.drawable.spacebackground));
+ * <p>
+ * }
+ * <p>
+ * public void update() {
+ * Background.update();
+ * }
+ **/
 
-        @Override
 
-        public boolean onTouch(View v, MotionEvent event){
-            if (event.getAction() == MotionEvent.ACTION_DOWN) {
+/**
+ @Override public void surfaceCreated(SurfaceHolder holder) {
+ background = new Background(BitmapFactory.decodeResource(getResources(), R.drawable.spacebackground));
 
-                return true;
-            }
-            return false;
-        }
-        **/
+ }
 
-
-        /**
-        @Override
-        public void surfaceCreated(SurfaceHolder holder) {
-            background = new Background(BitmapFactory.decodeResource(getResources(), R.drawable.spacebackground));
-
-        }
-
-        public void update() {
-            Background.update();
-        }
-        **/
+ public void update() {
+ Background.update();
+ }
+ **/
 
 
 
