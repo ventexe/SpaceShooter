@@ -3,8 +3,8 @@ package uk.ac.reading.vn013442.spaceshooter;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -19,7 +19,7 @@ public class EndScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.end_screen);
 
-        TextView scoreLabel = (TextView) findViewById(R.id.scoreLabel);
+      /*  TextView scoreLabel = (TextView) findViewById(R.id.scoreLabel);
         TextView highScoreLabel = (TextView) findViewById(R.id.highScoreLabel);
 
         int score = getIntent().getIntExtra("SCORE", 0);
@@ -36,7 +36,7 @@ public class EndScreen extends AppCompatActivity {
             editor.commit();
         } else {
             highScoreLabel.setText("High Score: " + highScore);
-        }
+        }*/
 
     }
 

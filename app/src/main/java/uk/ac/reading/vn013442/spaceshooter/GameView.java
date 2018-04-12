@@ -1,97 +1,88 @@
 package uk.ac.reading.vn013442.spaceshooter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
-import android.graphics.Path;
-import android.graphics.Point;
-import android.view.Display;
+import android.support.v7.app.AppCompatActivity;
+import android.util.DisplayMetrics;
+import android.util.TypedValue;
+import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
-import android.view.WindowManager;
+import android.view.View;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
+import uk.ac.reading.vn013442.spaceshooter.drawable.Bullet;
+import uk.ac.reading.vn013442.spaceshooter.drawable.Enemy;
+import uk.ac.reading.vn013442.spaceshooter.drawable.Entity;
+import uk.ac.reading.vn013442.spaceshooter.drawable.Player;
 
 public class GameView extends SurfaceView implements Runnable {
 
-    Canvas canvas;
-    Paint paint;
+    private List<Entity> entities = new ArrayList<>();
+    private Context context;
+    private GameEngine engine;
+    private SurfaceHolder holder;
 
-    Thread drawThread = null;
-    SurfaceHolder holder;
-    volatile boolean running;
+    private boolean pressIsHeld = false;
+    private Player.Direction playerDirection;
+    private TapSide lastTapSide;
+    private long lastBulletSpawn;
+    private int score = 0;
 
-    Bitmap bmPlayer;
-    Bitmap bmEnemy;
-    Bitmap bmBullet;
-    Bitmap bmAsteroid;
-    Bitmap bmBackground;
+    private volatile boolean running;
+    private Thread drawThread = null;
+    private DisplayMetrics displayMetrics = new DisplayMetrics();
 
-    Context CURRENT_CONTEXT;
-    Context SENSOR_CONTEXT;
-    Context TYPE_ACCELEROMETER;
-    Context TYPE_MAGNETIC_FIELD;
+    private Player player;
 
-    private int screenWidth;
-    private int screenHeight;
-
-    int x;
-    int y;
-
-    public GameEngine engine;
-
-    Path enemyPath;
-
-    List<Drawable> entities = new ArrayList<>();
-    OrientationData orientationData;
-
-
-    //private Point playerPoint;
-
-    //private OrientationData orientationData;
-
-    public GameView(Context context) {
-
+    public GameView(final Context context) {
         super(context);
 
+        this.context = context;
         engine = ((GameEngine) context);
+//        ((AppCompatActivity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+        displayMetrics = getResources().getDisplayMetrics();
 
-        CURRENT_CONTEXT = Constants.CURRENT_CONTEXT = context;
-        this.paint = new Paint();
 
-        this.bmPlayer = BitmapFactory.decodeResource(getResources(), R.drawable.player);
+        setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                lastTapSide = event.getX() >= displayMetrics.widthPixels / 2 ? TapSide.RIGHT : TapSide.LEFT;
+                System.out.println(lastTapSide.name());
 
-        this.bmEnemy = BitmapFactory.decodeResource(getResources(), R.drawable.enemy);
+                if (lastTapSide == TapSide.LEFT) {
+                    if (event.getY() >= displayMetrics.heightPixels / 2) {
+                        playerDirection = Player.Direction.North;
+                    } else {
+                        playerDirection = Player.Direction.South;
+                    }
+                }
 
-        this.bmBullet = BitmapFactory.decodeResource(getResources(), R.drawable.bullet);
+                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                    pressIsHeld = true;
+                } else if (event.getAction() == MotionEvent.ACTION_UP) {
+                    pressIsHeld = false;
+                }
 
-        this.bmAsteroid = BitmapFactory.decodeResource(getResources(), R.drawable.asteroid);
-
-        this.bmBackground = BitmapFactory.decodeResource(getResources(), R.drawable.spacebackground);
-
+                return true;
+            }
+        });
 
         this.holder = getHolder();
-
-
         //add objects to screen
-        entities.add(new Player(bmPlayer, 20, 200));
-        entities.add(new Enemy(bmEnemy, 1000, 0));
-        entities.add(new Enemy(bmEnemy, 1000, 200));
-        entities.add(new Enemy(bmEnemy, 1000, 400));
-        entities.add(new Bullet(bmBullet, 200, 275));
+
+        player = new Player(context, 20, 200);
+        entities.add(player);
+        entities.add(new Enemy(context, 1000, 0));
+        entities.add(new Enemy(context, 1000, 200));
+        entities.add(new Enemy(context, 1000, 400));
         //entities.add(new Player(bmAsteroid, 500, 200));
-
-
-        orientationData = new OrientationData();
-        orientationData.register();
-
-
     }
 
 
@@ -106,6 +97,9 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
+    public void spawnBullet(int x, int y) {
+        entities.add(new Bullet(context, x, y));
+    }
 
     public void resume() {
         running = true;
@@ -116,101 +110,123 @@ public class GameView extends SurfaceView implements Runnable {
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-
-        canvas.drawColor(Color.BLACK);
-        canvas.drawText("1", 50, 50, paint);
     }
-
-
-    public boolean Collision(Bitmap image, int x, int y) {
-        return getCollision(image, x, y);
-    }
-
-    public getCollision Collision(Bitmap image, int x, int y) {
-        for (Bullet image : Enemy) {
-            if(Bullet instanceof Enemy) {
-                bmEnemy.recycle();  //remove enemy
-            }
-        }
-
-        return null;
-    }
-
-
 
     @Override
     public void run() {
         while (running) {
-
             //Update first
             update();
 
             //Draw updates
             draw();
 
-            for (Drawable entity : entities) {
+            List<Entity> clonedEntities = new ArrayList<>(entities);
+            for (Entity entity : clonedEntities) {
                 if (entity instanceof Enemy) {
-                    if (entity.x <= 0) {
+                    if (entity.getX() <= 0) {
                         running = false;
+                    }
+                } else if (entity instanceof Bullet) {
+                    if (entity.getX() + entity.getImage().getWidth() >= displayMetrics.widthPixels) {
+                        entities.remove(entity);
                     }
                 }
             }
 
-            if (orientationData != null) {
-
-                if (orientationData.getOrientation() != null && orientationData.getStartOrientation() != null) {
-
-                    float pitch = orientationData.getOrientation()[1] - orientationData.getStartOrientation()[1]; //pi to -pi
-                    float roll = orientationData.getOrientation()[2] - orientationData.getStartOrientation()[2];    //p/2 to -p/2, account for this
-
-                    float xSpeed = 2 * roll * Constants.SCREEN_WIDTH / 1000f;
-                    float ySpeed = pitch * Constants.SCREEN_HEIGHT / 1000f;
-
-                    //Direction.x += Math.abs(xSpeed*elapsedTime) > 5 ? xSpeed*elapsedTime : 0;
-                    //Direction.y -= Math.abs(ySpeed*elapsedTime) > 5 ? ySpeed*elapsedTime : 0;
-                }
-
-            }
-
         }
 
-        engine.openEndScreen(10);
+        engine.openEndScreen(score);
 
     }
 
-
     //update the data from the game
     private void update() {
-        for (int i = 0; i < entities.size(); i++) {
-            for (Drawable drawable : entities) {
-                if (drawable instanceof Enemy) {
-                    ((Enemy) drawable).move();
+        List<Entity> entitiesToSpawn = new ArrayList<>();
+        List<Entity> clonedEntities = new ArrayList<>(entities);
+        for (Entity entity : clonedEntities) {
+            if (entity instanceof IMoving) {
+                ((IMoving) entity).move();
+            }
 
+            if (entity instanceof ICollision) {
+                Entity collidingEntity = getCollisionWithAnyEnemy(((ICollision) entity));
+                if (collidingEntity != null) {
+                    entities.remove(collidingEntity);
+                    entities.remove(entity);
+
+                    score++;
                 }
-                if (drawable instanceof Bullet) {
-                    ((Bullet) drawable).move();
+            }
+
+            if (entity instanceof Player) {
+                if (pressIsHeld) {
+                    if (lastTapSide == TapSide.RIGHT && System.currentTimeMillis() - lastBulletSpawn > 1000) {
+                        //Player wants to shoot a bullet
+                        entities.add(new Bullet(context, entity.getX() + entity.getImage().getWidth(), entity.getY() + (entity.getImage().getHeight() / 2)));
+                        lastBulletSpawn = System.currentTimeMillis();
+                    } else if (lastTapSide == TapSide.LEFT) {
+                        ((Player) entity).move(playerDirection);
+
+                    }
                 }
             }
         }
 
+        entities.addAll(entitiesToSpawn);
+    }
+
+    private Entity getCollisionWithAnyEnemy(final ICollision collidingEntity) {
+        List<Entity> enemyEntities = new ArrayList<>();
+        for (Entity entity : entities) {
+            if (entity instanceof Enemy) {
+                enemyEntities.add(entity);
+            }
+        }
+
+        Collections.sort(enemyEntities, new Comparator<Entity>() {
+            @Override
+            public int compare(Entity o1, Entity o2) {
+                int enemy1CenterY = o1.getY() + (o1.getImage().getHeight() / 2);
+                int enemy2CenterY = o2.getY() + (o2.getImage().getHeight() / 2);
+                return enemy1CenterY == enemy2CenterY ? 0
+                        : enemy1CenterY > enemy2CenterY ? -1
+                        : 1;
+            }
+        });
+
+        for (Entity otherEntity : enemyEntities) {
+            if (collidingEntity.isCollision(otherEntity)) {
+                return otherEntity;
+            }
+        }
+
+        return null;
     }
 
     //draw here
     private void draw() {
         if (holder.getSurface().isValid()) {
-            canvas = holder.lockCanvas();
-
+            final Paint paint = new Paint();
+            Canvas canvas = holder.lockCanvas();
             canvas.drawColor(Color.argb(255, 0, 0, 0));
 
-            for (Drawable entity : entities) {
+            for (Entity entity : entities) {
                 canvas.drawBitmap(entity.getImage(), entity.getX(), entity.getY(), paint);
             }
+
+            paint.setColor(Color.YELLOW);
+
+            int fontSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, displayMetrics);
+            paint.setTextSize(fontSize);
+            System.out.println(displayMetrics.heightPixels);
+            canvas.drawText(String.format("Score: %d", score), displayMetrics.widthPixels / 2, 120, paint);
 
             holder.unlockCanvasAndPost(canvas);
         }
     }
 
-
+    public enum TapSide {
+        LEFT, RIGHT
+    }
 }
-
-
