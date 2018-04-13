@@ -39,12 +39,16 @@ public class GameView extends SurfaceView implements Runnable {
     private Thread drawThread = null;
     private DisplayMetrics displayMetrics = new DisplayMetrics();
 
+    private SoundEffects sound;
+
     private Player player;
 
     public GameView(final Context context) {
         super(context);
 
         this.context = context;
+        sound = new SoundEffects(this);
+
         engine = ((GameEngine) context);
 //        ((AppCompatActivity) context).getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
         displayMetrics = getResources().getDisplayMetrics();
@@ -75,6 +79,8 @@ public class GameView extends SurfaceView implements Runnable {
         });
 
         this.holder = getHolder();
+
+
         //add objects to screen
 
         player = new Player(context, 20, 200);
@@ -82,6 +88,7 @@ public class GameView extends SurfaceView implements Runnable {
         entities.add(new Enemy(context, 1000, 0));
         entities.add(new Enemy(context, 1000, 200));
         entities.add(new Enemy(context, 1000, 400));
+
         //entities.add(new Player(bmAsteroid, 500, 200));
     }
 
@@ -99,6 +106,7 @@ public class GameView extends SurfaceView implements Runnable {
 
     public void spawnBullet(int x, int y) {
         entities.add(new Bullet(context, x, y));
+
     }
 
     public void resume() {
@@ -165,6 +173,7 @@ public class GameView extends SurfaceView implements Runnable {
                         //Player wants to shoot a bullet
                         entities.add(new Bullet(context, entity.getX() + entity.getImage().getWidth(), entity.getY() + (entity.getImage().getHeight() / 2)));
                         lastBulletSpawn = System.currentTimeMillis();
+                        sound.playBulletHitSound();
                     } else if (lastTapSide == TapSide.LEFT) {
                         ((Player) entity).move(playerDirection);
 

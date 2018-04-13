@@ -8,11 +8,13 @@ public class GameEngine extends AppCompatActivity {
 
     private GameView view;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         view = new GameView(this);
         setContentView(view);
+
     }
 
     @Override
