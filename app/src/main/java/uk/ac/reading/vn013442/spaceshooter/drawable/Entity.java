@@ -2,6 +2,9 @@ package uk.ac.reading.vn013442.spaceshooter.drawable;
 
 import android.graphics.Bitmap;
 
+/*
+Holds all of the data for images and their x/y coordinates
+ */
 
 public abstract class Entity {
 
@@ -14,17 +17,6 @@ public abstract class Entity {
         this.x = x;
         this.y = y;
     }
-
-
-    /**
-     * protected Bitmap createSubImageAt(Bitmap image, int x, int y)  {
-     * <p>
-     * //Bitmap subImage = Bitmap.createBitmap(image, col* width, row* height ,width, height);
-     * //Bitmap subImage = Bitmap.createBitmap(image, col* width, row* height ,width, height);
-     * Bitmap subImage = Bitmap.createBitmap(x, y, image);
-     * <p>
-     * return subImage;
-     */
 
     public int getX() {
         return this.x;

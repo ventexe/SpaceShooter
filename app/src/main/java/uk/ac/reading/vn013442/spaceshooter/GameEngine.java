@@ -14,7 +14,6 @@ public class GameEngine extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         view = new GameView(this);
         setContentView(view);
-
     }
 
     @Override

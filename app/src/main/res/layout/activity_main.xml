@@ -31,9 +31,9 @@
         android:id="@+id/bullet"
         android:layout_width="118dp"
         android:layout_height="44dp"
-        android:layout_alignStart="@+id/shoot"
         android:layout_centerVertical="true"
-        android:layout_marginStart="14dp"
+        android:layout_marginStart="15dp"
+        android:layout_toEndOf="@+id/player"
         app:srcCompat="@drawable/bullet"
         tools:layout_editor_absoluteX="123dp"
         tools:layout_editor_absoluteY="233dp" />
@@ -48,37 +48,6 @@
         app:srcCompat="@drawable/enemy"
         tools:layout_editor_absoluteX="327dp"
         tools:layout_editor_absoluteY="224dp" />
-
-    <ImageView
-        android:id="@+id/asteroid"
-        android:layout_width="33dp"
-        android:layout_height="35dp"
-        android:layout_above="@+id/player"
-        android:layout_alignEnd="@+id/shoot"
-        android:layout_marginBottom="81dp"
-        android:layout_marginEnd="11dp"
-        app:srcCompat="@drawable/asteroid"
-        tools:layout_editor_absoluteX="248dp"
-        tools:layout_editor_absoluteY="369dp" />
-
-    <Button
-        android:id="@+id/shoot"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="13dp"
-        android:text="Shoot"
-        tools:layout_editor_absoluteX="280dp"
-        tools:layout_editor_absoluteY="16dp" />
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView"
-        android:layout_toEndOf="@+id/bullet"
-        android:text="Quit" />
 
 
 </RelativeLayout>

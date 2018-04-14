@@ -26,5 +26,4 @@
         android:scaleType="fitXY"
         app:srcCompat="@drawable/bgmain" />
 
-
 </RelativeLayout>

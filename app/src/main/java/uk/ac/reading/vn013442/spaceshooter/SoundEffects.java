@@ -16,9 +16,7 @@ public class SoundEffects {
     }
 
     public void playBulletHitSound() {
-
         soundPool.play(bulletHit, 1.0f, 1.0f, 1, 0, 1.0f);
-
     }
 
 }
