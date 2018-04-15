@@ -6,48 +6,13 @@
     android:layout_height="match_parent"
     tools:context="uk.ac.reading.vn013442.spaceshooter.GameEngine">
 
-    <TextView
+    <ImageView
+        android:id="@+id/bgimageblank"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:id="@+id/textView" />
-
-    <ImageView
-        android:id="@+id/player"
-        android:layout_width="121dp"
-        android:layout_height="64dp"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="18dp"
-        android:layout_toEndOf="@+id/textView"
-        android:src="@drawable/player"
-        app:srcCompat="@drawable/player"
-        tools:layout_editor_absoluteX="16dp"
-        tools:layout_editor_absoluteY="223dp" />
-
-    <ImageView
-        android:id="@+id/bullet"
-        android:layout_width="118dp"
-        android:layout_height="44dp"
-        android:layout_centerVertical="true"
-        android:layout_marginStart="15dp"
-        android:layout_toEndOf="@+id/player"
-        app:srcCompat="@drawable/bullet"
-        tools:layout_editor_absoluteX="123dp"
-        tools:layout_editor_absoluteY="233dp" />
-
-    <ImageView
-        android:id="@+id/enemy"
-        android:layout_width="50dp"
-        android:layout_height="62dp"
-        android:layout_alignBottom="@+id/player"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="13dp"
-        app:srcCompat="@drawable/enemy"
-        tools:layout_editor_absoluteX="327dp"
-        tools:layout_editor_absoluteY="224dp" />
-
+        android:layout_alignParentTop="true"
+        android:scaleType="fitXY"
+        app:srcCompat="@drawable/bgimageblank" />
 
 </RelativeLayout>

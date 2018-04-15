@@ -25,6 +25,12 @@ import uk.ac.reading.vn013442.spaceshooter.drawable.Entity;
 import uk.ac.reading.vn013442.spaceshooter.drawable.Player;
 import uk.ac.reading.vn013442.spaceshooter.level.Level;
 
+/**
+ * move player
+ * add player
+ * add levels
+ * update game
+ */
 public class GameView extends SurfaceView implements Runnable {
 
     private List<Entity> entities = new ArrayList<>();
@@ -54,28 +60,33 @@ public class GameView extends SurfaceView implements Runnable {
 
     private static final Random RANDOM = new Random();
 
+    /**
+     * tap listener for detecting movement
+     *
+     * @param context
+     */
     public GameView(final Context context) {
         super(context);
 
         this.context = context;
-        sound = new SoundEffects(context);
+        sound = new SoundEffects(context);  //plays bullet sound effect
         engine = ((GameEngine) context);
         displayMetrics = getResources().getDisplayMetrics();
 
         setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                lastTapSide = event.getX() >= displayMetrics.widthPixels / 2 ? TapSide.RIGHT : TapSide.LEFT;
+                lastTapSide = event.getX() >= displayMetrics.widthPixels / 2 ? TapSide.RIGHT : TapSide.LEFT;   //left side of screen used for movement
 
                 if (lastTapSide == TapSide.LEFT) {
                     if (event.getY() >= displayMetrics.heightPixels / 2) {
-                        playerDirection = Player.Direction.North;
+                        playerDirection = Player.Direction.North;   //go up
                     } else {
-                        playerDirection = Player.Direction.South;
+                        playerDirection = Player.Direction.South;   //go down
                     }
                 }
 
-                if (event.getAction() == MotionEvent.ACTION_DOWN) {
+                if (event.getAction() == MotionEvent.ACTION_DOWN) { //if tap held, move, if not held, don't move
                     pressIsHeld = true;
                 } else if (event.getAction() == MotionEvent.ACTION_UP) {
                     pressIsHeld = false;
@@ -87,15 +98,24 @@ public class GameView extends SurfaceView implements Runnable {
 
         this.holder = getHolder();
 
+        /**
+         * add new player
+         */
         player = new Player(context, 20, 200);
         entities.add(player);
 
-        allLevels.add(new Level(3, 1));
-        allLevels.add(new Level(4, 2));
-        allLevels.add(new Level(4, 3));
+
+        /**
+         * add new levels
+         */
+        allLevels.add(new Level(3, 1)); //add new level 3 enemies 1 health
+        allLevels.add(new Level(4, 2)); //add new level 4 enemies 2 health
+        allLevels.add(new Level(4, 3)); //add new level 4 enemies 3 health
     }
 
-
+    /**
+     * catch exception
+     */
     public void pause() {
         running = false;
         if (drawThread != null) {
@@ -121,22 +141,23 @@ public class GameView extends SurfaceView implements Runnable {
     @Override
     public void run() {
         while (running) {
-            //Update first
+            //update first
             update();
 
-            //Draw updates
+            //draw updates
             draw();
 
+            //handles multiple enemies/bullets
             List<Entity> clonedEntities = new ArrayList<>(entities);
             clonedEntities.addAll(new ArrayList<>(enemies));
-            for (Entity entity : clonedEntities) {
+            for (Entity entity : clonedEntities) {  //loop through and check if they are instance of
                 if (entity instanceof Enemy) {
                     if (entity.getX() <= 0) {
                         running = false;
                     }
                 } else if (entity instanceof Bullet) {
                     if (entity.getX() + entity.getImage().getWidth() >= displayMetrics.widthPixels) {
-                        entities.remove(entity);
+                        entities.remove(entity);    //remove if instance of
                     }
                 }
             }
@@ -151,7 +172,7 @@ public class GameView extends SurfaceView implements Runnable {
         if (height == 0) {
             height = getHeight();
         }
-
+        //level handling
         if (currentLevel == null && height > 0) {
             Level firstLevel = allLevels.get(0);
             currentLevel = firstLevel;
@@ -168,14 +189,14 @@ public class GameView extends SurfaceView implements Runnable {
             if (entity instanceof ICollision) {
                 Entity collidingEntity = getCollisionWithAnyEnemy(((ICollision) entity));
                 if (collidingEntity != null) {
-                    //Remove the bullet from the game
+                    //remove the bullet from the game
                     entities.remove(entity);
 
                     Enemy collidingEnemy = (Enemy) collidingEntity;
                     collidingEnemy.takeDamage();
 
                     if (collidingEnemy.getHealth() <= 0) {
-                        //The entity has no remaining health, remove it from the game
+                        //the entity has no remaining health, remove it from the game
                         enemies.remove(collidingEnemy);
                         score++;
                     }
@@ -184,8 +205,8 @@ public class GameView extends SurfaceView implements Runnable {
 
             if (entity instanceof Player) {
                 if (pressIsHeld) {
-                    if (lastTapSide == TapSide.RIGHT && System.currentTimeMillis() - lastBulletSpawn > 1000) {
-                        //Player wants to shoot a bullet
+                    if (lastTapSide == TapSide.RIGHT && System.currentTimeMillis() - lastBulletSpawn > 1000) {  //waited 1000 milliseconds before allowing another shot
+                        //player wants to shoot a bullet
                         entities.add(new Bullet(context, entity.getX() + entity.getImage().getWidth(), entity.getY() + (entity.getImage().getHeight() / 2)));
                         lastBulletSpawn = System.currentTimeMillis();
                         sound.playBulletHitSound();
@@ -228,6 +249,11 @@ public class GameView extends SurfaceView implements Runnable {
         engine.openEndScreen(score);
     }
 
+    /**
+     * creates random level with random amount of enemies, incrementing
+     *
+     * @param level
+     */
     private void startLevel(Level level) {
         Bitmap enemyBitmap = BitmapFactory.decodeResource(context.getResources(), R.drawable.enemy);
         for (int i = 0; i < level.amountOfEnemies; i++) {
@@ -246,6 +272,13 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
+    /**
+     * prevents enemies spawning on each other
+     *
+     * @param x
+     * @param y
+     * @return
+     */
     private boolean isPositionFree(int x, int y) {
         for (Entity enemy : enemies) {
             int minX = enemy.getX();
@@ -261,6 +294,12 @@ public class GameView extends SurfaceView implements Runnable {
         return true;
     }
 
+    /**
+     * enemy collision, bounding boxes for multiple enemies
+     *
+     * @param collidingEntity
+     * @return
+     */
     private Entity getCollisionWithAnyEnemy(final ICollision collidingEntity) {
         List<Entity> enemyEntities = new ArrayList<>();
         for (Entity entity : enemies) {
@@ -270,7 +309,7 @@ public class GameView extends SurfaceView implements Runnable {
         Collections.sort(enemyEntities, new Comparator<Entity>() {
             @Override
             public int compare(Entity o1, Entity o2) {
-                int enemy1CenterY = o1.getY() + (o1.getImage().getHeight() / 2);
+                int enemy1CenterY = o1.getY() + (o1.getImage().getHeight() / 2);    //bounding boxes
                 int enemy2CenterY = o2.getY() + (o2.getImage().getHeight() / 2);
                 return enemy1CenterY == enemy2CenterY ? 0
                         : enemy1CenterY > enemy2CenterY ? -1
@@ -287,7 +326,10 @@ public class GameView extends SurfaceView implements Runnable {
         return null;
     }
 
-    //draw here
+
+    /**
+     * draw here
+     */
     private void draw() {
         if (holder.getSurface().isValid()) {
             final Paint paint = new Paint();

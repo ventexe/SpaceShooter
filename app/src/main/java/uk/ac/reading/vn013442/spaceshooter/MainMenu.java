@@ -7,6 +7,9 @@ import android.view.View;
 import android.widget.Button;
 
 
+/**
+ * main menu containing buttons
+ */
 public class MainMenu extends AppCompatActivity {
 
     private Button BtnPlay;
@@ -21,7 +24,6 @@ public class MainMenu extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 openPlay();
-                //orientationData.newGame();
             }
         });
     }

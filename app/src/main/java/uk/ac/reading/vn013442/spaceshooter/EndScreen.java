@@ -14,6 +14,11 @@ public class EndScreen extends AppCompatActivity {
     private Button btnQuit;
 
 
+    /**
+     * contains the end screen, shows score and calculates highscore
+     *
+     * @param savedInstanceState
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,11 +45,21 @@ public class EndScreen extends AppCompatActivity {
 
     }
 
+    /**
+     * starts a new game by switching to game activity
+     *
+     * @param view
+     */
     public void playAgain(View view) {
         Intent intent = new Intent(this, GameEngine.class);
         startActivity(intent);
     }
 
+    /**
+     * quits by going to main menu activity
+     *
+     * @param view
+     */
     public void btnQuit(View view) {
         Intent intent = new Intent(this, MainMenu.class);
         startActivity(intent);
