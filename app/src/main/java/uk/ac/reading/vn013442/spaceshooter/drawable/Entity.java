@@ -2,15 +2,16 @@ package uk.ac.reading.vn013442.spaceshooter.drawable;
 
 import android.graphics.Bitmap;
 
-/*
-Holds all of the data for images and their x/y coordinates
- */
 
+/**
+ * getters/setters
+ * holds all of the data for images and their x/y coordinates
+ */
 public abstract class Entity {
 
-    private Bitmap image;
     protected int x;
     protected int y;
+    private Bitmap image;
 
     public Entity(Bitmap image, int x, int y) {
         this.image = image;

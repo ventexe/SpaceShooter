@@ -16,7 +16,7 @@ public class Player extends Entity {
     /**
      * if direction north, go up 10 pixels, if direction south, go down 10 pixels
      *
-     * @param direction
+     * @param direction the player tries to move in
      */
     public void move(Direction direction) {
         switch (direction) {
@@ -30,6 +30,9 @@ public class Player extends Entity {
     }
 
 
+    /**
+     * enum for direction
+     */
     public enum Direction {
         North, South
     }

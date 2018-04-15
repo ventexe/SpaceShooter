@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.graphics.Rect;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.MotionEvent;
@@ -13,6 +14,17 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -28,42 +40,37 @@ import uk.ac.reading.vn013442.spaceshooter.level.Level;
 /**
  * move player
  * add player
- * add levels
+ * add levels/load levels
  * update game
  */
 public class GameView extends SurfaceView implements Runnable {
 
+    private static final Random RANDOM = new Random();
     private List<Entity> entities = new ArrayList<>();
     private List<Entity> enemies = new ArrayList<>();
-
     private Context context;
     private GameEngine engine;
     private SurfaceHolder holder;
     private int height = 0;
-
     private boolean pressIsHeld = false;
     private Player.Direction playerDirection;
     private TapSide lastTapSide;
     private long lastBulletSpawn;
     private int score = 0;
-
     private volatile boolean running;
     private Thread drawThread = null;
     private DisplayMetrics displayMetrics = new DisplayMetrics();
-
+    private Bitmap bgImage;
     private SoundEffects sound;
-
     private Player player;
-
+    private Paint paint = new Paint();
     private Level currentLevel;
     private List<Level> allLevels = new ArrayList<>();
-
-    private static final Random RANDOM = new Random();
 
     /**
      * tap listener for detecting movement
      *
-     * @param context
+     * @param context game area
      */
     public GameView(final Context context) {
         super(context);
@@ -72,6 +79,7 @@ public class GameView extends SurfaceView implements Runnable {
         sound = new SoundEffects(context);  //plays bullet sound effect
         engine = ((GameEngine) context);
         displayMetrics = getResources().getDisplayMetrics();
+        bgImage = BitmapFactory.decodeResource(getResources(), R.drawable.bgimageblank);
 
         setOnTouchListener(new View.OnTouchListener() {
             @Override
@@ -105,39 +113,83 @@ public class GameView extends SurfaceView implements Runnable {
         entities.add(player);
 
 
-        /**
-         * add new levels
-         */
-        allLevels.add(new Level(3, 1)); //add new level 3 enemies 1 health
-        allLevels.add(new Level(4, 2)); //add new level 4 enemies 2 health
-        allLevels.add(new Level(4, 3)); //add new level 4 enemies 3 health
+        //try to load json file with levels, code adapted from https://stackoverflow.com/a/6349913
+        InputStream is = getResources().openRawResource(R.raw.levels);
+        Writer writer = new StringWriter();
+        char[] buffer = new char[1024];
+        try {
+            Reader reader = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            int n;
+            while ((n = reader.read(buffer)) != -1) {
+                writer.write(buffer, 0, n);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        //load the json string to json object to parse the levels, docs: https://developer.android.com/reference/org/json/JSONObject.html
+        String jsonString = writer.toString();
+        try {
+            JSONObject jsonObj = new JSONObject(jsonString);
+            JSONArray levels = jsonObj.getJSONArray("levels");
+            for (int i = 0; i < levels.length(); i++) {
+                JSONObject level = levels.getJSONObject(i);
+                Level newLevel = new Level(level.getInt("amountOfEnemies"), level.getInt("enemyHealth"));
+
+                System.out.println("Added new level with amount of enemies: " + newLevel.amountOfEnemies + ", health: " + newLevel.enemyHealth);
+                allLevels.add(newLevel);
+            }
+        } catch (JSONException e) {
+            //no levels could be loaded, add default levels
+            allLevels.add(new Level(3, 1)); //add new level 3 enemies 1 health
+            allLevels.add(new Level(4, 2)); //add new level 4 enemies 2 health
+            allLevels.add(new Level(4, 3)); //add new level 4 enemies 3 health
+        }
+
+        System.out.println("Started game with " + allLevels.size() + " levels.");
     }
 
     /**
-     * catch exception
+     * stops drawThread,
      */
     public void pause() {
         running = false;
         if (drawThread != null) {
             try {
-                drawThread.join();
+                drawThread.join();  //finish current task
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
     }
 
+    /**
+     * start new drawThread
+     */
     public void resume() {
         running = true;
         drawThread = new Thread(this);
         drawThread.start();
     }
 
+    /**
+     * draws on canvas
+     * @param canvas
+     */
     @Override
     public void onDraw(Canvas canvas) {
         super.onDraw(canvas);
     }
 
+    /**
+     * draws and updates
+     */
     @Override
     public void run() {
         while (running) {
@@ -157,7 +209,7 @@ public class GameView extends SurfaceView implements Runnable {
                     }
                 } else if (entity instanceof Bullet) {
                     if (entity.getX() + entity.getImage().getWidth() >= displayMetrics.widthPixels) {
-                        entities.remove(entity);    //remove if instance of
+                        entities.remove(entity);    //remove the bullet from the game if it goes off screen
                     }
                 }
             }
@@ -167,7 +219,9 @@ public class GameView extends SurfaceView implements Runnable {
         finishGame();
     }
 
-    //update the data from the game
+    /**
+     * collision calculations
+     */
     private void update() {
         if (height == 0) {
             height = getHeight();
@@ -181,7 +235,7 @@ public class GameView extends SurfaceView implements Runnable {
 
         List<Entity> clonedEntities = new ArrayList<>(entities);
         clonedEntities.addAll(new ArrayList<>(enemies));
-        for (Entity entity : clonedEntities) {
+        for (Entity entity : clonedEntities) {  //loop through and check instanceof
             if (entity instanceof IMoving) {
                 ((IMoving) entity).move();
             }
@@ -205,7 +259,7 @@ public class GameView extends SurfaceView implements Runnable {
 
             if (entity instanceof Player) {
                 if (pressIsHeld) {
-                    if (lastTapSide == TapSide.RIGHT && System.currentTimeMillis() - lastBulletSpawn > 1000) {  //waited 1000 milliseconds before allowing another shot
+                    if (lastTapSide == TapSide.RIGHT && System.currentTimeMillis() - lastBulletSpawn > 1000) {  //wait 1000 milliseconds before allowing another shot
                         //player wants to shoot a bullet
                         entities.add(new Bullet(context, entity.getX() + entity.getImage().getWidth(), entity.getY() + (entity.getImage().getHeight() / 2)));
                         lastBulletSpawn = System.currentTimeMillis();
@@ -227,6 +281,7 @@ public class GameView extends SurfaceView implements Runnable {
             }
         }
 
+        //increment enemies (unless already 5 enemies) and health for each level
         if (currentLevel != null && enemies.isEmpty()) {
             int currentLevelIndex = allLevels.indexOf(currentLevel);
             int nextLevelIndex = currentLevelIndex + 1;
@@ -245,6 +300,9 @@ public class GameView extends SurfaceView implements Runnable {
         }
     }
 
+    /**
+     * finish game and open end screen
+     */
     private void finishGame() {
         engine.openEndScreen(score);
     }
@@ -266,7 +324,7 @@ public class GameView extends SurfaceView implements Runnable {
 
                 randomX = RANDOM.nextInt(max - min) + min;
                 randomY = RANDOM.nextInt(height - enemyBitmap.getHeight());
-            } while (!isPositionFree(randomX, randomY));
+            } while (!isPositionFree(randomX, randomY, enemyBitmap.getWidth(), enemyBitmap.getHeight()));
 
             enemies.add(new Enemy(context, randomX, randomY, level.enemyHealth));
         }
@@ -275,18 +333,22 @@ public class GameView extends SurfaceView implements Runnable {
     /**
      * prevents enemies spawning on each other
      *
-     * @param x
-     * @param y
-     * @return
+     * @param x coordinate
+     * @param y coordinate
+     * @return false if enemies not spawing on each other
      */
-    private boolean isPositionFree(int x, int y) {
+    private boolean isPositionFree(int x, int y, int width, int height) {
+        Rect ownBoundingRectangle = new Rect(x, y + height, x + width, y);
+
         for (Entity enemy : enemies) {
             int minX = enemy.getX();
             int minY = enemy.getY();
             int maxX = enemy.getX() + enemy.getImage().getWidth();
             int maxY = enemy.getY() + enemy.getImage().getHeight();
 
-            if (x >= minX && x <= maxX && y >= minY && y <= maxY) {
+            Rect enemyBoundingRectangle = new Rect(minX, maxY, maxX, minY);
+
+            if (ownBoundingRectangle.intersect(enemyBoundingRectangle)) {
                 return false;
             }
         }
@@ -332,9 +394,8 @@ public class GameView extends SurfaceView implements Runnable {
      */
     private void draw() {
         if (holder.getSurface().isValid()) {
-            final Paint paint = new Paint();
             Canvas canvas = holder.lockCanvas();
-            canvas.drawColor(Color.argb(255, 0, 0, 0));
+            canvas.drawBitmap(bgImage, 0, 0, paint);
 
             for (Entity entity : entities) {
                 canvas.drawBitmap(entity.getImage(), entity.getX(), entity.getY(), paint);
@@ -348,12 +409,15 @@ public class GameView extends SurfaceView implements Runnable {
 
             int fontSize = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 16, displayMetrics);
             paint.setTextSize(fontSize);
-            canvas.drawText(String.format("Score: %d", score), displayMetrics.widthPixels / 2, 120, paint);
+            canvas.drawText("Score: " + score, displayMetrics.widthPixels / 2, 120, paint);
 
             holder.unlockCanvasAndPost(canvas);
         }
     }
 
+    /**
+     * holds which side is being tapped
+     */
     public enum TapSide {
         LEFT, RIGHT
     }

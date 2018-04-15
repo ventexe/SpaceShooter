@@ -22,6 +22,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".EndScreen" />
+        <activity android:name=".EndScreen"
+            android:configChanges="orientation"
+            android:screenOrientation="landscape" />
     </application>
 </manifest>

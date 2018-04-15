@@ -9,14 +9,17 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+/**
+ * game engine for functionality
+ * contains the end screen, shows score and calculates highscore
+ */
 public class EndScreen extends AppCompatActivity {
 
     private Button btnQuit;
 
 
     /**
-     * contains the end screen, shows score and calculates highscore
-     *
+     * high score calculations
      * @param savedInstanceState
      */
     @Override

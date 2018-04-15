@@ -1,0 +1,20 @@
+{
+   "levels":[
+      {
+         "amountOfEnemies":3,
+         "enemyHealth":1
+      },
+      {
+         "amountOfEnemies":4,
+         "enemyHealth":2
+      },
+      {
+         "amountOfEnemies":4,
+         "enemyHealth":3
+      },
+      {
+         "amountOfEnemies":4,
+         "enemyHealth":4
+      }
+   ]
+}

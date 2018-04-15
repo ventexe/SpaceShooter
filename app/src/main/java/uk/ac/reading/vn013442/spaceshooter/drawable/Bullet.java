@@ -15,9 +15,9 @@ public class Bullet extends Entity implements IMoving, ICollision {
     /**
      * holds data for moving
      *
-     * @param context
-     * @param x
-     * @param y
+     * @param context current area
+     * @param x coordinate
+     * @param y coordinate
      */
     public Bullet(Context context, int x, int y) {
         super(BitmapFactory.decodeResource(context.getResources(), R.drawable.bullet), x, y);
@@ -29,7 +29,7 @@ public class Bullet extends Entity implements IMoving, ICollision {
      */
     @Override
     public void move() {
-        if (System.currentTimeMillis() - this.lastMove < 100) {
+        if (System.currentTimeMillis() - this.lastMove < 50) {
             return;
         }
         this.x -= -10;
@@ -40,7 +40,7 @@ public class Bullet extends Entity implements IMoving, ICollision {
      * checks for collision between bitmaps, calculates bounding boxes
      *
      * @param otherItem
-     * @return
+     * @return if false if not colliding
      */
     @Override
     public boolean isCollision(Entity otherItem) {

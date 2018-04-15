@@ -17,9 +17,9 @@ public class Enemy extends Entity implements IMoving {
 
     /**
      * @param context
-     * @param x
-     * @param y
-     * @param health
+     * @param x coordinate
+     * @param y coordinate
+     * @param health of enemy
      */
     public Enemy(Context context, int x, int y, int health) {
         super(BitmapFactory.decodeResource(context.getResources(), R.drawable.enemy), x, y);
@@ -38,7 +38,7 @@ public class Enemy extends Entity implements IMoving {
     /**
      * returns health
      *
-     * @return
+     * @return movement
      */
     public int getHealth() {
         return health;
