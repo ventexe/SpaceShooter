@@ -26,4 +26,13 @@
         android:scaleType="fitXY"
         app:srcCompat="@drawable/bgmain" />
 
+    <TextView
+        android:id="@+id/instructions"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/BtnPlay"
+        android:layout_centerHorizontal="true"
+        android:text="Hold down on the left side of the screen to move. Tap the right side of the screen to shoot."
+        android:textColor="#FFFF00" />
+
 </RelativeLayout>
